@@ -218,8 +218,8 @@ window.onload = function() {
 		score -= 900;
 		scoreText.text = 'You died, oh no... Final Score: ' + score;
 		thisDiamond.kill();
-		player.kill();
-		var theEnd = diamonds.create(600, 368, 'theend');
+		//player.kill();
+		//var theEnd = diamonds.create(600, 368, 'theend');
 		//player.kill();
 		//listen.loopFull();
 	}
