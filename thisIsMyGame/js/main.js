@@ -30,7 +30,7 @@ window.onload = function() {
 	var cursors;
 
 	var stars;
-	var diamond;
+	var diamonds;
 
 	var listen;
 
