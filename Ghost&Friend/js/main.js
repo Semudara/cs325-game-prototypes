@@ -20,7 +20,7 @@ window.onload = function() {
 	var walls; // these are gonna be... you can't walk through these.
 	var playerFriend; // hello, there!
 	var playerGhost; // boo!
-	var glowy; // you want these
+	var glowyThings; // you want these
 	var gates;
 
 	var hitWall; // collisons lol
@@ -28,6 +28,9 @@ window.onload = function() {
 	var hitGate;
 	var cursors; // user input
 	var music;
+
+	var glowyCollide;
+	var glowyGhostCollide;
 
 	// this functions loads all assets into the game as present data
 	function preload() {
@@ -79,6 +82,11 @@ window.onload = function() {
 		var anGate = gates.create(250, 200, 'gate');
 		anGate.body.immovable = true;
 
+		glowyThings = game.add.group();
+		glowyThings.enableBody = true;
+		var glowy_1 = glowyThings.create(150, 300, 'glowy');
+		var glowy_2 = glowyThings.create(200, 50, 'glowy');
+
 		cursors = game.input.keyboard.createCursorKeys();
 		game.input.keyboard.addKeys( { 'upp': Phaser.Keyboard.W, 'downn': Phaser.Keyboard.S, 'leftt': Phaser.Keyboard.A, 'rightt': Phaser.Keyboard.D } );
 
@@ -88,11 +96,19 @@ window.onload = function() {
 		music.play();
 	}
 
+	function collectIt (player, star)
+	{
+		star.kill();
+	}
+
 	// And let's let things HAPPEN in this world~
 	function update () {
 		hitWall = game.physics.arcade.collide(playerFriend, walls);
 		ghostHitWall = game.physics.arcade.collide(playerGhost, walls);
 		hitGate = game.physics.arcade.collide(playerFriend, gates);
+
+		glowyCollide = game.physics.arcade.overlap(playerFriend, glowyThings, collectIt, null, this);
+		glowyGhostCollide = game.physics.arcade.overlap(playerGhost, glowyThings, collectIt, null, this);
 
 		playerFriend.body.velocity.x = 0;
 		playerFriend.body.velocity.y = 0;
