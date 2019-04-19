@@ -16,9 +16,14 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 	var cursors;
 	var heroDirection;
 	var isMoving;
+	var flower;
+	var youWon;
+	var walls;
 
 	var music0;
 	var ourHero;
+	var scoreText;
+	var hitWall;
 
 	function preload () // Okay, bring in the clowns!!!
 	{
@@ -26,6 +31,8 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 		game.load.image('lampOff', 'assets/visual/wall.png');
 		game.load.image('lampOn', 'assets/visual/diamond.png');
 		game.load.image('sky_bg', 'assets/visual/sky.png');
+		game.load.image('flower', 'assets/visual/flower.png');
+		game.load.image('wall', 'assets/visual/wall.png');
 		game.load.spritesheet('aHumbleLamp', 'assets/visual/shiftDiamond.png', 32, 28);
 
 		game.load.spritesheet('ourHero', 'assets/visual/heroStrip.png', 32, 32);
@@ -42,13 +49,23 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 		theLamp.fixedToCamera = true;
 
 		game.physics.startSystem(Phaser.Physics.ARCADE); // we need physics i guess!
+		scoreText = game.add.text(16, 16, 'Try to get the flower...', { fontSize: '32px', fill: '#000' });
+		walls = game.add.group();
+		walls.enableBody = true;
+		var anWall = walls.create(0, game.world.height - 64, 'wall'); anWall.body.immovable = true;
+		var anotherWall = walls.create(300, 100, 'wall'); anotherWall.body.immovable = true;
+		var thirdWall = walls.create(332, 100, 'wall'); thirdWall.body.immovable = true;
 
 
 		heroDirection = 0;
 		isMoving = false;
+		youWon = false;
+		flower = game.add.sprite(70, 50, 'flower');
 		ourHero = game.add.sprite(200, 150, 'ourHero', heroDirection);
 		game.physics.arcade.enable(ourHero);
+		game.physics.arcade.enable(flower);
 		ourHero.enableBody = true;
+		flower.enableBody = true;
 		ourHero.body.collideWorldBounds = true;
 
 		music0 = game.add.audio('pumpupthejams');
@@ -101,17 +118,21 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 			if (heroDirection == 1)
 			{
 				ourHero.body.velocity.x = 200;
+				ourHero.body.velocity.y = 0;
 			}
 			else if (heroDirection == 2)
 			{
+				ourHero.body.velocity.x = 0;
 				ourHero.body.velocity.y = -200;
 			}
 			else if (heroDirection == 3)
 			{
 				ourHero.body.velocity.x = -200;
+				ourHero.body.velocity.y = 0;
 			}
 			else if (heroDirection == 4)
 			{
+				ourHero.body.velocity.x = 0;
 				ourHero.body.velocity.y = 200;
 			}
 			ourHero.frame = heroDirection;
@@ -123,10 +144,31 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 		}
 	}
 
+	function checkForCompletion()
+	{
+		game.physics.arcade.overlap(ourHero, flower, collectIt, null, this);
+	}
+
+	function collectIt (player, flower)
+	{
+  	 	// Removes the flower from the screen
+  	 	flower.kill();
+
+  	 	youWon = true;
+
+   		// And congratulate the player on winning!
+    	scoreText.text = 'You got the flower! Congrats~!';
+	}
 
 
 	function step () // Keep turning that crank, darn you! Give the crowds a little ACTION!!
 	{
-		updateLamp();
+		// scoreText.text = 'You got the flower! Congrats~!';
+		if (!youWon)
+		{
+			checkForCompletion();
+			updateLamp();
+		}
+		hitWall = game.physics.arcade.collide(ourHero, walls);
 		updateHero();
 	}
